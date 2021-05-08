@@ -44,7 +44,6 @@ async def pcr(ctx, user: discord.Member):
 async def on_message(message):
     # We need this line to allow usage of bot.commands()
     await bot.process_commands(message)
-
     if message.author == bot.user:
         return
 
