@@ -1,9 +1,18 @@
+import random
 import re
 import discord
 from datetime import datetime
 from discord.ext import commands
 
-bot = commands.Bot(command_prefix="%")
+intents = discord.Intents.default()
+intents.members = True
+bot = commands.Bot(command_prefix="%", intents=intents)
+transmission_rate = .5
+
+
+def risk_infection(message):
+    role = discord.utils.find(lambda r: r.name == 'Covided', message.guild.roles)
+    return role in message.guild.get_member(message.author.id).roles
 
 
 @bot.event
@@ -37,13 +46,20 @@ async def on_message(message):
     await bot.process_commands(message)
 
     # Logging
-    # print("{}".format(message.content.lower()))
+    last_message = await message.channel.history(limit=2).flatten()
+    last_message = last_message[1]
+    print("{} répond à {} - {}".format(message.author, last_message.author, message.content.lower()))
 
     if message.author == bot.user:
         return
 
-    if "pangolin" in message.content:
-        await get_covid(message)
+    if risk_infection(last_message):
+        if risk_infection(message):
+            print("Déjà infecté - exit")
+        elif random.random() < transmission_rate:
+            await get_covid(message)
+        else:
+            print("Coup de chance, pas infecté")
 
     # FONCTIONS BONUS
     if "covid" in message.content:
