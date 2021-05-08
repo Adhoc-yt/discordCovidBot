@@ -45,22 +45,6 @@ async def on_message(message):
     # We need this line to allow usage of bot.commands()
     await bot.process_commands(message)
 
-    # Logging
-    last_message = await message.channel.history(limit=2).flatten()
-    last_message = last_message[1]
-    print("{} répond à {} - {}".format(message.author, last_message.author, message.content.lower()))
-
-    if message.author == bot.user:
-        return
-
-    if risk_infection(last_message):
-        if risk_infection(message):
-            print("Déjà infecté - exit")
-        elif random.random() < transmission_rate:
-            await get_covid(message)
-        else:
-            print("Coup de chance, pas infecté")
-
     # FONCTIONS BONUS
     if "covid" in message.content:
         await message.channel.send("On m'a appelé?")
@@ -72,6 +56,20 @@ async def on_message(message):
     if ''.join(filter(str.isalpha, message.content.lower())).endswith("quoi") \
             and not message.content.lower().endswith(">"):
         await message.channel.send("FEUR!")
+
+    # Logging
+    last_message = await message.channel.history(limit=2).flatten()
+    last_message = last_message[1]
+    print("{} répond à {} - {}".format(message.author, last_message.author, message.content.lower()))
+
+    if message.author == bot.user:
+        return
+
+    if risk_infection(last_message):
+        if risk_infection(message) or random.random() > transmission_rate:
+            return
+        else:
+            await get_covid(message)
 
 
 if __name__ == '__main__':
