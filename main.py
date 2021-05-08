@@ -45,6 +45,9 @@ async def on_message(message):
     # We need this line to allow usage of bot.commands()
     await bot.process_commands(message)
 
+    if message.author == bot.user:
+        return
+
     # FONCTIONS BONUS
     if "covid" in message.content:
         await message.channel.send("On m'a appelé?")
@@ -61,9 +64,6 @@ async def on_message(message):
     last_message = await message.channel.history(limit=2).flatten()
     last_message = last_message[1]
     print("{} répond à {} - {}".format(message.author, last_message.author, message.content.lower()))
-
-    if message.author == bot.user:
-        return
 
     if risk_infection(last_message):
         if risk_infection(message) or random.random() > transmission_rate:
