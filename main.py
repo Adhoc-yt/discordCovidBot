@@ -36,8 +36,15 @@ suffixes_peu_glorieux = [" le gilet jaune",
                          " le cocu",
                          " le puceau",
                          " le con",
-                         " l'idiot"
+                         " l'idiot",
+                         " le fourbe",
+                         " l'incel",
+                         " l'enfoiré",
+                         " le dingue",
+                         " le cinglé",
+                         " l'invalide"
                          ]
+
 
 # Fonction infection_passive, qui infecte les membres côte à côte dans la liste alphabétique des users
 # Fonction %geste_barrière, si invoquée le membre ne peut pas être infecté en postant son message
@@ -63,7 +70,7 @@ async def show_symptoms(message):
     if role_covid in message.guild.get_member(message.author.id).roles \
             and random.random() <= proba_symptom:
         suffixe = random.choice(suffixes_peu_glorieux)
-        await message.author.edit(nick=message.author.name+suffixe)
+        await message.author.edit(nick=message.author.name + suffixe)
         print(f'Nickname changed: {message.author}')
 
 
@@ -78,8 +85,11 @@ async def on_ready() -> None:
 
 
 async def get_covid(message):
+    if message.author == bot.user:
+        return
     role = discord.utils.get(message.author.guild.roles, name=role_covid_name)
     await message.author.add_roles(role)
+    await show_symptoms(message)
     await message.channel.send(f"{message.author.name} est maintenant {role.name}")
 
 
@@ -126,6 +136,12 @@ async def ondes5g(ctx, user_client: discord.Member):
             "L'antenne 5G est installée, mais personne n'est malade... Pour l'instant"
         ]
         await ctx.send(random.choice(replies))
+
+
+@ondes5g.error  # <- name of the command + .error
+async def help_mod_error(ctx, error):
+    if isinstance(error, commands.MissingRole):
+        await ctx.send("Encore un mec de Free qui se prend pour un Technicien Orange. Pas de 5G pour toi!")
 
 
 # Si le membre a le covid, seul Dr Raoult peut utiliser la commande Chloroquine sur ce membre
@@ -193,7 +209,10 @@ async def on_message(message):
     last_message = last_message[1]
     await show_symptoms(message)
     print("{} répond à {} - {}".format(message.author, last_message.author, message.content.lower()))
-    if message.author == bot.user or message.content == "%geste_barrière":
+    if message.content == "%geste_barrière" \
+            or message.content == "%geste_barriere" \
+            or message.content == "%gestes_barrieres" \
+            or message.content == "%gestes_barrières":
         return
 
     # FONCTIONS BONUS
