@@ -85,7 +85,7 @@ async def on_ready() -> None:
 
 
 async def get_covid(message):
-    if message.author == bot.user:
+    if message.author.bot:
         return
     role = discord.utils.get(message.author.guild.roles, name=role_covid_name)
     await message.author.add_roles(role)
@@ -126,9 +126,9 @@ async def ondes5g(ctx, user_client: discord.Member):
     proba_covid = 0.70
 
     if role_covid in user_client.roles:
-        await ctx.send(f"{user_client} a déjà la 5G.")
+        await ctx.send(f"{user_client.name} a déjà la 5G.")
     elif random.random() <= proba_covid:
-        await ctx.send(f"{user_client} a la 5G, et le covid.")
+        await ctx.send(f"{user_client.name} a la 5G, et le covid.")
         await user_client.add_roles(role_covid)
     else:
         replies = [
@@ -207,6 +207,10 @@ async def on_message(message):
     # Logging
     last_message = await message.channel.history(limit=2).flatten()
     last_message = last_message[1]
+
+    if message.author == bot.user:
+        return
+
     await show_symptoms(message)
     print("{} répond à {} - {}".format(message.author, last_message.author, message.content.lower()))
     if message.content == "%geste_barrière" \
