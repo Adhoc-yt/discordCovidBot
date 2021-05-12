@@ -7,13 +7,15 @@ from discord.ext import commands
 intents = discord.Intents.default()
 intents.members = True
 bot = commands.Bot(command_prefix="%", intents=intents)
-transmission_rate = .5
+transmission_rate = .87
 
 # TODO: ajouter les rôles Covided et Dr Raoult sur des nouveaux serveur
 # Fonction infection_passive, qui infecte les membres côte à côte dans la liste alphabétique des users
-# Fonction %geste_barrière, divise par 3 la proba de choper le covid
+# Fonction %geste_barrière, si invoquée le membre ne peux pas être infecté en postant son message
+# Fonction %vaccin, divise par 10 les chances d'être infecté
 # Fonction %stats, qui indique le nombre de personnes infectées sur l'ensemble du serveur, hors bot
 # Si Covid, nickname suffixe peu glorieux (le raciste, le gros, le pédants, etc), une fois guéri on l'enlève
+# Le rôle 5G permet d'utiliser la commande %5g @member et d'infecter cette personne
 
 
 def risk_infection(message):
@@ -39,6 +41,32 @@ async def on_command_error(ctx, error):
                            description=f"Oh non Docteur, nous n'avons plus de chloroquine!\n\
                                         Nous en aurons à nouveau dans {error.retry_after:.2f} secondes.")
         await ctx.send(embed=em)
+        await ctx.send(error.args)
+
+
+# Si Installateur 5G, peut installer une antenne 5G près d'un membre qui a une chance de refiler le covid
+@bot.command(pass_context=True)
+@commands.has_role('5G')
+@commands.cooldown(2, 60, commands.BucketType.guild)
+async def ondes5g(ctx, user_client: discord.Member):
+    """
+    Dose de 5G - Usage: %5G @member
+    :return: null, a une chance d'infecter du Covid (parce que la 5G refile le coronavirus, c'est scientifique)
+    """
+    role_covid = discord.utils.find(lambda r: r.name == 'Covided', ctx.message.guild.roles)
+    proba_covid = 0.70
+
+    if role_covid in user_client.roles:
+        await ctx.send(f"{user_client} a déjà la 5G.")
+    elif random.random() <= proba_covid:
+        await ctx.send("Le client a la 5G, et le covid.")
+        await user_client.add_roles(role_covid)
+    else:
+        replies = [
+            "Rien ne s'est produit, mais j'ai un meilleur réseau!",
+            "L'antenne 5G est installée, mais personne n'est malade... Pour l'instant"
+        ]
+        await ctx.send(random.choice(replies))
 
 
 # Si le membre a le covid, seul Dr Raoult peut utiliser la commande Chloroquine sur ce membre
@@ -46,7 +74,7 @@ async def on_command_error(ctx, error):
 # Comme la chloroquine devient rare, Dr Raoult ne peut utiliser la choloroquine que 2 fois toutes les minutes
 @bot.command(pass_context=True)
 @commands.has_role('Dr Raoult le Fédérateur')
-@commands.cooldown(1, 120, commands.BucketType.guild)
+@commands.cooldown(2, 60, commands.BucketType.guild)
 async def chloroquine(ctx, user_patient: discord.Member):
     """
     Dose de choloroquine - Usage: %chloroquine @member
@@ -55,7 +83,7 @@ async def chloroquine(ctx, user_patient: discord.Member):
     role_covid = discord.utils.find(lambda r: r.name == 'Covided', ctx.message.guild.roles)
     proba_kick = 0.05
     # Idée historique patient, injections ratées augmentent risque de mort
-    proba_guerison = 0.7
+    proba_guerison = 0.70
 
     if role_covid in user_patient.roles:
         if random.random() <= proba_kick:
@@ -75,6 +103,12 @@ Pour revenir: https://discord.gg/6QEvgHWnM3")
             "Ce patient est guéri !... Mais n'était pas malade."
         ]
         await ctx.send(random.choice(replies))
+
+
+@chloroquine.error  # <- name of the command + .error
+async def help_mod_error(ctx, error):
+    if isinstance(error, commands.MissingRole):
+        await ctx.send("Vous n'êtes pas Docteur, sale usurpateur ! Cassez-vous !")
 
 
 @bot.command(pass_context=True)
@@ -104,7 +138,7 @@ async def on_message(message):
     # FONCTIONS BONUS
     if "covid" in message.content:
         await message.channel.send("On m'a appelé?")
-    if "pied" in message.content:
+    if "pied" in message.content or "feet" in message.content:
         await message.channel.send("Ah, ça parle de pied? <@!830199237856723004> est fétichiste!")
     if "éthique" in message.content:
         await message.channel.send("> L'éthique, c'est pour les pauvres.\n- <@!307964302533591050>")
