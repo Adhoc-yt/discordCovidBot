@@ -222,24 +222,30 @@ async def on_message(message):
     # FONCTIONS BONUS
     if "covid" in message.content:
         await message.channel.send("On m'a appelé?")
+        return
     if "pied" in message.content or "feet" in message.content:
         await message.channel.send("Ah, ça parle de pied? <@!830199237856723004> est fétichiste!")
+        return
     if "éthique" in message.content:
         await message.channel.send("> L'éthique, c'est pour les pauvres.\n- <@!307964302533591050>")
+        return
 
     # détection cyrillique => cyka
     if re.search('[а-яА-Я]', message.content):
         await message.channel.send("сука блять")
+        return
 
     if ''.join(filter(str.isalpha, message.content.lower())).endswith("quoi") \
             and not message.content.lower().endswith(">"):
         await message.channel.send("FEUR!")
+        return
 
     if not message.author.bot and risk_infection(last_message):
         if risk_infection(message) or random.random() >= transmission_rate:
             return
         else:
             await get_covid(message)
+            return
 
 
 if __name__ == '__main__':
