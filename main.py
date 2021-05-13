@@ -49,7 +49,23 @@ suffixes_peu_glorieux = [" le gilet jaune",
                          " le fan de pieds",
                          " le mécréant",
                          " l'infidèle",
-                         " le porc"
+                         " le porc",
+                         " le ramolo",
+                         " le relou",
+                         " le soumis",
+                         " le bâtard",
+                         " le nul",
+                         " le faible",
+                         " le malhonnête",
+                         " le brise-burnes",
+                         " le clochard",
+                         " l'abruti",
+                         " le pauvre",
+                         " le drogué",
+                         " le boulimique",
+                         " l'anorexique",
+                         " l'obsédé",
+                         " le pervers"
                          ]
 
 
@@ -107,22 +123,22 @@ async def on_command_error(ctx, error):
         print("Erreur perms")
 
     if isinstance(error, commands.CommandOnCooldown):
-        em = discord.Embed(title=f"Cooldown",
+        em = discord.Embed(title=f":warning: Cooldown",
                            description=f"Retentez la commande dans {error.retry_after:.2f} secondes.")
         if ctx.command.qualified_name == "ondes5g":
-            em = discord.Embed(title=f"Alerte gilets Jaunes",
-                               description=f"Oh non, les gilets jaunes bloquent le rond-point!\n\
+            em = discord.Embed(title=f":warning: Alerte gilets Jaunes",
+                               description=f":signal_strength: Oh non, les gilets jaunes bloquent le rond-point!\n\
                                              Tu pourras installer une antenne 5G dans {error.retry_after:.2f} secondes.")
         elif ctx.command.qualified_name == "heal":
-            em = discord.Embed(title=f"Rupture de stock",
-                               description=f"Oh non Docteur, nous n'avons plus de chloroquine!\n\
+            em = discord.Embed(title=f":warning: Rupture de stock",
+                               description=f":medical_symbol: Oh non Docteur, nous n'avons plus de chloroquine!\n\
                                         Nous en aurons à nouveau dans {error.retry_after:.2f} secondes.")
 
         await ctx.send(embed=em)
 
 
 # Si Installateur 5G, peut installer une antenne 5G près d'un membre qui a une chance de refiler le covid
-@bot.command(pass_context=True, aliases=['antenne5g', 'antenne5G', 'ondes5G'])
+@bot.command(pass_context=True, aliases=['antenne5g', 'antenne5G', 'ondes5G', '5g', '5G'])
 @commands.has_role(role_5g_name)
 @commands.cooldown(1, 60, commands.BucketType.guild)
 async def ondes5g(ctx, user_client: discord.Member):
@@ -132,16 +148,18 @@ async def ondes5g(ctx, user_client: discord.Member):
     """
     role_covid = discord.utils.find(lambda r: r.name == role_covid_name, ctx.message.guild.roles)
     proba_covid = 0.70
+    if user_client.bot:
+        return
 
     if role_covid in user_client.roles:
-        await ctx.send(f"{user_client.name} a déjà la 5G.")
+        await ctx.send(f":signal_strength: {user_client.name} a déjà la 5G.")
     elif random.random() <= proba_covid:
-        await ctx.send(f"{user_client.name} a la 5G, et le covid.")
+        await ctx.send(f":signal_strength: {user_client.name} a la 5G, et le covid.")
         await user_client.add_roles(role_covid)
     else:
         replies = [
-            "Rien ne s'est produit, mais j'ai un meilleur réseau!",
-            "L'antenne 5G est installée, mais personne n'est malade... Pour l'instant"
+            ":signal_strength: Rien ne s'est produit, mais j'ai un meilleur réseau!",
+            ":signal_strength: L'antenne 5G est installée, mais personne n'est malade... Pour l'instant"
         ]
         await ctx.send(random.choice(replies))
 
@@ -149,7 +167,7 @@ async def ondes5g(ctx, user_client: discord.Member):
 @ondes5g.error  # <- name of the command + .error
 async def help_mod_error(ctx, error):
     if isinstance(error, commands.MissingRole):
-        await ctx.send("Encore un mec de Free qui se prend pour un Technicien Orange. Pas de 5G pour toi!")
+        await ctx.send(":x: Encore un mec de Free qui se prend pour un Technicien Orange. Pas de 5G pour toi!")
 
 
 # Si le membre a le covid, seul Dr Raoult peut utiliser la commande Chloroquine sur ce membre
@@ -167,13 +185,15 @@ async def heal(ctx, user_patient: discord.Member):
     proba_kick = 0.05
     # Idée historique patient, injections ratées augmentent risque de mort
     proba_guerison = 0.80
+    if user_patient.bot:
+        return
 
     if role_covid in user_patient.roles:
         if random.random() <= proba_kick:
             await user_patient.send(":medical_symbol: Le Covid n'a pas eu raison de toi, mais le docteur, oui.\n\
 Pour revenir: https://discord.gg/6QEvgHWnM3")
             await ctx.guild.kick(user_patient, reason="Chloroquined")
-            await ctx.send(f":medical_symbol: {user_patient} n'a pas survécu à sa dose de choloroquine!")
+            await ctx.send(f":medical_symbol: {user_patient.name} n'a pas survécu à sa dose de choloroquine!")
         elif random.random() <= proba_guerison:
             await user_patient.remove_roles(role_covid)
             await ctx.send(f":medical_symbol: {user_patient.name} est guéri, merci Docteur!")
@@ -192,7 +212,7 @@ Pour revenir: https://discord.gg/6QEvgHWnM3")
 @heal.error  # <- name of the command + .error
 async def help_mod_error(ctx, error):
     if isinstance(error, commands.MissingRole):
-        await ctx.send("Vous n'êtes pas Docteur, sale usurpateur ! Cassez-vous !")
+        await ctx.send(":x: Vous n'êtes pas Docteur, sale usurpateur ! Cassez-vous !")
 
 
 @bot.command(pass_context=True)
