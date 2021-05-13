@@ -53,6 +53,7 @@ suffixes_peu_glorieux = [" le gilet jaune",
                          ]
 
 
+# Fonction Usage et Help (erreur mauvais paramètres + description du jeu)
 # Fonction infection_passive, qui infecte les membres côte à côte dans la liste alphabétique des users
 # Fonction %geste_barrière, si invoquée le membre ne peut pas être infecté en postant son message
 # Fonction %vaccin, divise par 10 les chances d'être infecté
