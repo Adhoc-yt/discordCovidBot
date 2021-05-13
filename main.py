@@ -42,7 +42,14 @@ suffixes_peu_glorieux = [" le gilet jaune",
                          " l'enfoiré",
                          " le dingue",
                          " le cinglé",
-                         " l'invalide"
+                         " l'invalide",
+                         " le consanguin",
+                         " le furry",
+                         " le casse-couilles",
+                         " le fan de pieds",
+                         " le mécréant",
+                         " l'infidèle",
+                         " le porc"
                          ]
 
 
@@ -105,7 +112,7 @@ async def on_command_error(ctx, error):
             em = discord.Embed(title=f"Alerte gilets Jaunes",
                                description=f"Oh non, les gilets jaunes bloquent le rond-point!\n\
                                              Tu pourras installer une antenne 5G dans {error.retry_after:.2f} secondes.")
-        elif ctx.command.qualified_name == "chloroquine":
+        elif ctx.command.qualified_name == "heal":
             em = discord.Embed(title=f"Rupture de stock",
                                description=f"Oh non Docteur, nous n'avons plus de chloroquine!\n\
                                         Nous en aurons à nouveau dans {error.retry_after:.2f} secondes.")
@@ -162,21 +169,21 @@ async def heal(ctx, user_patient: discord.Member):
 
     if role_covid in user_patient.roles:
         if random.random() <= proba_kick:
-            await user_patient.send("Le Covid n'a pas eu raison de toi, mais le docteur, oui.\n\
+            await user_patient.send(":medical_symbol: Le Covid n'a pas eu raison de toi, mais le docteur, oui.\n\
 Pour revenir: https://discord.gg/6QEvgHWnM3")
             await ctx.guild.kick(user_patient, reason="Chloroquined")
-            await ctx.send(f"{user_patient} n'a pas survécu à sa dose de choloroquine!")
+            await ctx.send(f":medical_symbol: {user_patient} n'a pas survécu à sa dose de choloroquine!")
         elif random.random() <= proba_guerison:
             await user_patient.remove_roles(role_covid)
-            await ctx.send(f"{user_patient.name} est guéri, merci Docteur!")
+            await ctx.send(f":medical_symbol: {user_patient.name} est guéri, merci Docteur!")
             await user_patient.edit(nick='')
         else:
-            await ctx.send("Le patient n'est pas guéri... Mais au moins, il n'est pas mort !")
+            await ctx.send(":medical_symbol: Le patient n'est pas guéri... Mais au moins, il n'est pas mort !")
     else:
         replies = [
-            "Mais enfin Docteur, ce patient est sain",
-            "Docteur, vous avez (encore) bu?",
-            "Ce patient est guéri !... Mais n'était pas malade."
+            ":medical_symbol: Mais enfin Docteur, ce patient est sain",
+            ":medical_symbol: Docteur, vous avez (encore) bu?",
+            ":medical_symbol: Ce patient est guéri !... Mais n'était pas malade."
         ]
         await ctx.send(random.choice(replies))
 
