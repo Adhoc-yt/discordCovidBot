@@ -10,7 +10,8 @@ bot = commands.Bot(command_prefix="%", intents=intents)
 transmission_rate = .87
 role_covid_name = 'Covided'
 role_dr_name = 'Dr Raoult le Fédérateur'
-role_5g_name = '5G'
+role_5g_name = 'Technicien Orange'
+role_masque_name = 'Porte un masque'
 suffixes_peu_glorieux = [" le gilet jaune",
                          " le malade",
                          " l'inutile",
@@ -74,13 +75,18 @@ suffixes_peu_glorieux = [" le gilet jaune",
 # Fonction %geste_barrière, si invoquée le membre ne peut pas être infecté en postant son message
 # Fonction %vaccin, divise par 10 les chances d'être infecté
 # Fonction %stats, qui indique le nombre de personnes infectées sur l'ensemble du serveur, hors bot
+# Fonction %masque qui permet de mettre un :masque:, a chaque une chance de le perdre, réduit le risque d'infection
 # Autre idée si Covid, le membre est en slowmode car insuffisance respiratoire
 
 
 @bot.command()
 @commands.has_role('Admin')
 async def setup(ctx):
-    for role in [role_covid_name, role_dr_name, role_5g_name]:
+    """
+    %setup - Vérifie et installe les rôles nécessaires au bon fonctionnement du bot.
+    Cette commande ne peut être utilisée que par les Admins (role Discord).
+    """
+    for role in [role_covid_name, role_dr_name, role_5g_name, role_masque_name]:
         if discord.utils.get(ctx.guild.roles, name=role):
             print(f"Role {role} exists")
         else:
@@ -101,6 +107,11 @@ async def show_symptoms(message):
 def risk_infection(message):
     role_covid = discord.utils.find(lambda r: r.name == role_covid_name, message.guild.roles)
     return role_covid in message.guild.get_member(message.author.id).roles
+
+
+def porte_masque(message):
+    role_masque = discord.utils.find(lambda r: r.name == role_masque_name, message.guild.roles)
+    return role_masque in message.guild.get_member(message.author.id).roles
 
 
 @bot.event
@@ -128,23 +139,30 @@ async def on_command_error(ctx, error):
         if ctx.command.qualified_name == "ondes5g":
             em = discord.Embed(title=f":warning: Alerte gilets Jaunes",
                                description=f":signal_strength: Oh non, les gilets jaunes bloquent le rond-point!\n\
-                                             Tu pourras installer une antenne 5G dans {error.retry_after:.2f} secondes.")
+Tu pourras installer une antenne 5G dans {error.retry_after:.2f} secondes.")
         elif ctx.command.qualified_name == "heal":
             em = discord.Embed(title=f":warning: Rupture de stock",
                                description=f":medical_symbol: Oh non Docteur, nous n'avons plus de chloroquine!\n\
-                                        Nous en aurons à nouveau dans {error.retry_after:.2f} secondes.")
+Nous en aurons à nouveau dans {error.retry_after:.2f} secondes.")
+        elif ctx.command.qualified_name == "masque":
+            em = discord.Embed(title=f":warning: Rupture de stock",
+                               description=f":mask: Oups, plus de masque!\n\
+On a oublié d'en commander. Nous en aurons à nouveau dans {error.retry_after:.2f} secondes.")
 
         await ctx.send(embed=em)
 
 
 # Si Installateur 5G, peut installer une antenne 5G près d'un membre qui a une chance de refiler le covid
-@bot.command(pass_context=True, aliases=['antenne5g', 'antenne5G', 'ondes5G', '5g', '5G'])
+@bot.command(aliases=['antenne5g', 'antenne5G', 'ondes5G', '5g', '5G'])
 @commands.has_role(role_5g_name)
 @commands.cooldown(1, 60, commands.BucketType.guild)
 async def ondes5g(ctx, user_client: discord.Member):
     """
-    Dose de 5G - Usage: %5G @member
-    :return: null, a une chance d'infecter du Covid (parce que la 5G refile le coronavirus, c'est scientifique)
+    Installe une antenne 5G près du membre - Usage: %5g @membre
+    Alias commande: %antenne5g, %antenne5G, %ondes5g, %5g, %5G
+    A une chance d'infecter le membre du Covid20 (parce que la 5G refile le coronavirus, c'est scientifique).
+    Cette commande ne peut être utilisée que par les Techniciens Orange (role Discord).
+    Cette commande est soumise à un cooldown.
     """
     role_covid = discord.utils.find(lambda r: r.name == role_covid_name, ctx.message.guild.roles)
     proba_covid = 0.70
@@ -173,13 +191,19 @@ async def help_mod_error(ctx, error):
 # Si le membre a le covid, seul Dr Raoult peut utiliser la commande Chloroquine sur ce membre
 # Cependant, la cholorquine a X% de chances de tuer le patient (kick serveur)
 # Comme la chloroquine devient rare, Dr Raoult ne peut utiliser la choloroquine que 2 fois toutes les minutes
-@bot.command(pass_context=True, aliases=['chloroquine'])
+@bot.command(aliases=['chloroquine'])
 @commands.has_role(role_dr_name)
 @commands.cooldown(2, 60, commands.BucketType.guild)
 async def heal(ctx, user_patient: discord.Member):
     """
-    Dose de choloroquine - Usage: %chloroquine @member
-    :return: null, a une chance de soigner du Covid ou de kick le membre
+    Injecte une dose de chloroquine au membre - Usage: %5g @membre
+    Alias commande: %chloroquine
+    A une chance de:
+    - Kick le membre (mort du covid20) qui reçoit une invitation en MP pour rejoindre
+    - Soigner le membre et enlever tout symptôme
+
+    Cette commande ne peut être utilisée que par Docteur Raoult Le Fédérateur (role Discord).
+    Cette commande est soumise à un cooldown.
     """
     role_covid = discord.utils.find(lambda r: r.name == role_covid_name, ctx.message.guild.roles)
     proba_kick = 0.05
@@ -190,10 +214,10 @@ async def heal(ctx, user_patient: discord.Member):
 
     if role_covid in user_patient.roles:
         if random.random() <= proba_kick:
-            await user_patient.send(":medical_symbol: Le Covid n'a pas eu raison de toi, mais le docteur, oui.\n\
+            await user_patient.send(":skull: Le Covid n'a pas eu raison de toi, mais le docteur, oui.\n\
 Pour revenir: https://discord.gg/6QEvgHWnM3")
             await ctx.guild.kick(user_patient, reason="Chloroquined")
-            await ctx.send(f":medical_symbol: {user_patient.name} n'a pas survécu à sa dose de choloroquine!")
+            await ctx.send(f":skull: {user_patient.name} n'a pas survécu à sa dose de choloroquine!")
         elif random.random() <= proba_guerison:
             await user_patient.remove_roles(role_covid)
             await ctx.send(f":medical_symbol: {user_patient.name} est guéri, merci Docteur!")
@@ -215,7 +239,22 @@ async def help_mod_error(ctx, error):
         await ctx.send(":x: Vous n'êtes pas Docteur, sale usurpateur ! Cassez-vous !")
 
 
-@bot.command(pass_context=True)
+@bot.command()
+@commands.cooldown(5, 60, commands.BucketType.guild)
+async def masque(ctx):
+    """
+    Met un masque
+    Possibilité de perdre son masque à chaque message posté
+    """
+    role_masque = discord.utils.find(lambda r: r.name == role_masque_name, ctx.message.guild.roles)
+    await ctx.message.author.add_roles(role_masque)
+    if role_masque in ctx.guild.get_member(ctx.message.author.id).roles:
+        await ctx.send(f":mask: {ctx.message.author.display_name} a remplacé son masque !")
+    else:
+        await ctx.send(f":mask: {ctx.message.author.display_name} a mis un masque !")
+
+
+@bot.command(aliases=['rt-pcr', 'test-anal'])
 async def pcr(ctx, user: discord.Member):
     """
     PCR test - Usage: %pcr @member
@@ -241,10 +280,23 @@ async def on_message(message):
 
     await show_symptoms(message)
     print("{} répond à {} - {}".format(message.author, last_message.author, message.content.lower()))
-    if message.content == "%geste_barrière" \
-            or message.content == "%geste_barriere" \
-            or message.content == "%gestes_barrieres" \
-            or message.content == "%gestes_barrières":
+    gestes_barrieres = ["%geste_barrière", "%geste_barriere", "%gestes_barrieres" "%gestes_barrières"]
+    if any(geste_barriere in message.content for geste_barriere in gestes_barrieres):
+        return
+
+    if porte_masque(message):
+        role_masque = discord.utils.find(lambda r: r.name == role_masque_name, message.guild.roles)
+        reponses_perte_masque = ["n'a plus de masque",
+                                 "a perdu son masque"]
+        proba_perte_masque = 0.30
+        if random.random() <= proba_perte_masque:
+            await message.author.remove_roles(role_masque)
+            if message.content == "%masque":
+                await message.channel.send(f"... Mais il est tombé :upside_down:\n\
+Bah alors {message.author.display_name}, on ne sait pas mettre un masque?\n\
+https://www.youtube.com/watch?v=N8saQ2mQE2U")
+            else:
+                await message.channel.send(f"{message.author.display_name} {random.choice(reponses_perte_masque)}")
         return
 
     # FONCTIONS BONUS
