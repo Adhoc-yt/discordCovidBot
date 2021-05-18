@@ -68,6 +68,7 @@ suffixes_peu_glorieux = [" le gilet jaune",
                          " l'obsédé",
                          " le pervers"
                          ]
+image_sibeth = discord.File('sibeth.png')
 
 
 # Fonction Usage et Help (erreur mauvais paramètres + description du jeu)
@@ -262,9 +263,9 @@ async def pcr(ctx, user: discord.Member):
     """
     role = discord.utils.find(lambda r: r.name == role_covid_name, ctx.message.guild.roles)
     if role in user.roles:
-        await ctx.send("{} a le Covid".format(user))
+        await ctx.send(":nauseated_face: {} a le Covid".format(user))
     else:
-        await ctx.send("{} est sain".format(user))
+        await ctx.send(":white_check_mark: {} est sain".format(user))
 
 
 @bot.event
@@ -288,13 +289,13 @@ async def on_message(message):
         role_masque = discord.utils.find(lambda r: r.name == role_masque_name, message.guild.roles)
         reponses_perte_masque = ["n'a plus de masque",
                                  "a perdu son masque"]
-        proba_perte_masque = 0.30
+        proba_perte_masque = 0.2
         if random.random() <= proba_perte_masque:
             await message.author.remove_roles(role_masque)
             if message.content == "%masque":
                 await message.channel.send(f"... Mais il est tombé :upside_down:\n\
-Bah alors {message.author.display_name}, on ne sait pas mettre un masque?\n\
-https://www.youtube.com/watch?v=N8saQ2mQE2U")
+Bah alors {message.author.display_name}, on ne sait pas mettre un masque?")
+                await message.channel.send(file=image_sibeth)
             else:
                 await message.channel.send(f"{message.author.display_name} {random.choice(reponses_perte_masque)}")
         return
