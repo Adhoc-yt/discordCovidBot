@@ -297,7 +297,7 @@ async def on_message(message):
         role_masque = discord.utils.find(lambda r: r.name == role_masque_name, message.guild.roles)
         reponses_perte_masque = ["n'a plus de masque",
                                  "a perdu son masque"]
-        proba_perte_masque = 0.2
+        proba_perte_masque = 0.07
         if random.random() <= proba_perte_masque:
             await message.author.remove_roles(role_masque)
             if message.content == "%masque":
@@ -311,12 +311,6 @@ Bah alors {message.author.display_name}, on ne sait pas mettre un masque?")
     # FONCTIONS BONUS
     if "covid" in message.content:
         await message.channel.send("On m'a appelé?")
-        return
-    if "pied" in message.content or "feet" in message.content:
-        await message.channel.send("Ah, ça parle de pied? <@!830199237856723004> est fétichiste!")
-        return
-    if "éthique" in message.content:
-        await message.channel.send("> L'éthique, c'est pour les pauvres.\n- <@!307964302533591050>")
         return
 
     # détection cyrillique => cyka
