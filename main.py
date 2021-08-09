@@ -297,7 +297,7 @@ async def on_message(message):
         role_masque = discord.utils.find(lambda r: r.name == role_masque_name, message.guild.roles)
         reponses_perte_masque = ["n'a plus de masque",
                                  "a perdu son masque"]
-        proba_perte_masque = 0.07
+        proba_perte_masque = 0.05
         if random.random() <= proba_perte_masque:
             await message.author.remove_roles(role_masque)
             if message.content == "%masque":
