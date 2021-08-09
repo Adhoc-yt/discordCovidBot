@@ -7,7 +7,7 @@ from discord.ext import commands
 intents = discord.Intents.default()
 intents.members = True
 bot = commands.Bot(command_prefix="%", intents=intents)
-transmission_rate = .87
+transmission_rate = .69
 role_covid_name = 'Covided'
 role_dr_name = 'Dr Raoult le Fédérateur'
 role_5g_name = 'Technicien Orange'
@@ -66,10 +66,12 @@ suffixes_peu_glorieux = [" le gilet jaune",
                          " le boulimique",
                          " l'anorexique",
                          " l'obsédé",
-                         " le pervers"
+                         " le pervers",
+                         " le pleutre",
+                         " l'impotent"
                          ]
 image_sibeth = discord.File('sibeth.png')
-
+covid_channel = "covid-log"
 
 # Fonction Usage et Help (erreur mauvais paramètres + description du jeu)
 # Fonction infection_passive, qui infecte les membres côte à côte dans la liste alphabétique des users
@@ -126,7 +128,13 @@ async def get_covid(message):
     role = discord.utils.get(message.author.guild.roles, name=role_covid_name)
     await message.author.add_roles(role)
     await show_symptoms(message)
-    await message.channel.send(f"{message.author.name} est maintenant {role.name}")
+
+    channel = message.channel
+    if covid_channel:
+        channel = discord.utils.get(message.author.guild.text_channels, name=covid_channel)
+
+    channel.send(f"{message.author.mention} est maintenant {role.name} "
+                 f"- plus d'EXP <:exp:874179122430103592> tant que pas guéri")
 
 
 @bot.event
