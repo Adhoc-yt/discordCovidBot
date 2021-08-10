@@ -236,7 +236,7 @@ Pour revenir: https://discord.gg/85yShvhRgX")
     else:
         replies = [
             ":medical_symbol: Mais enfin Docteur, ce patient est sain",
-            ":medical_symbol: Docteur, vous avez (encore) bu?",
+            ":medical_symbol: Docteur, vous avez (encore) bu ?",
             ":medical_symbol: Ce patient est guéri !... Mais n'était pas malade."
         ]
         await ctx.send(random.choice(replies))
