@@ -4,6 +4,7 @@ import discord
 from datetime import datetime
 from discord.ext import commands
 
+# Config bot
 intents = discord.Intents.default()
 intents.members = True
 bot = commands.Bot(command_prefix="%", intents=intents)
@@ -68,10 +69,23 @@ suffixes_peu_glorieux = [" le gilet jaune",
                          " l'obsédé",
                          " le pervers",
                          " le pleutre",
-                         " l'impotent"
+                         " l'impotent",
+                         " le pédophile",
+                         " l'angoissé",
+                         " le maniaco-dépressif",
+                         " le schizophrène",
+                         " l'obèse morbide",
+                         " l'impuissant"
                          ]
 image_sibeth = discord.File('sibeth.png')
 covid_channel = "covid-log"
+# Probas
+proba_perte_masque = 0.01
+proba_guerison_chloroquine = 0.80
+proba_guerison_solo = 0.10
+proba_covid_5g = 0.70
+proba_symptom = 0.30
+proba_kick_chloroquine = 0.05
 
 # Fonction Usage et Help (erreur mauvais paramètres + description du jeu)
 # Fonction infection_passive, qui infecte les membres côte à côte dans la liste alphabétique des users
@@ -98,13 +112,21 @@ async def setup(ctx):
 
 
 async def show_symptoms(message):
-    proba_symptom = 0.20
     role_covid = discord.utils.find(lambda r: r.name == role_covid_name, message.guild.roles)
     if role_covid in message.guild.get_member(message.author.id).roles \
             and random.random() <= proba_symptom:
         suffixe = random.choice(suffixes_peu_glorieux)
         await message.author.edit(nick=message.author.name + suffixe)
         print(f'Nickname changed: {message.author}')
+
+
+async def self_heal(message):
+    role_covid = discord.utils.find(lambda r: r.name == role_covid_name, message.guild.roles)
+    if role_covid in message.guild.get_member(message.author.id).roles \
+            and random.random() <= proba_guerison_solo:
+        await message.guild.get_member(message.author.id).remove_roles(role_covid)
+        await message.channel.send(f":medical_symbol: {message.author.mention} est guéri !")
+        await message.guild.get_member(message.author.id).edit(nick='')
 
 
 def risk_infection(message):
@@ -174,13 +196,12 @@ async def ondes5g(ctx, user_client: discord.Member):
     Cette commande est soumise à un cooldown.
     """
     role_covid = discord.utils.find(lambda r: r.name == role_covid_name, ctx.message.guild.roles)
-    proba_covid = 0.70
     if user_client.bot:
         return
 
     if role_covid in user_client.roles:
         await ctx.send(f":signal_strength: {user_client.name} a déjà la 5G.")
-    elif random.random() <= proba_covid:
+    elif random.random() <= proba_covid_5g:
         await ctx.send(f":signal_strength: {user_client.name} a la 5G, et le covid.")
         await user_client.add_roles(role_covid)
     else:
@@ -215,19 +236,18 @@ async def heal(ctx, user_patient: discord.Member):
     Cette commande est soumise à un cooldown.
     """
     role_covid = discord.utils.find(lambda r: r.name == role_covid_name, ctx.message.guild.roles)
-    proba_kick = 0.05
+
     # Idée historique patient, injections ratées augmentent risque de mort
-    proba_guerison = 0.80
     if user_patient.bot:
         return
 
     if role_covid in user_patient.roles:
-        if random.random() <= proba_kick:
+        if random.random() <= proba_kick_chloroquine:
             await user_patient.send(":skull: Le Covid n'a pas eu raison de toi, mais le docteur, oui.\n\
 Pour revenir: https://discord.gg/85yShvhRgX")
             await ctx.guild.kick(user_patient, reason="Chloroquined")
             await ctx.send(f":skull: {user_patient.name} n'a pas survécu à sa dose de choloroquine!")
-        elif random.random() <= proba_guerison:
+        elif random.random() <= proba_guerison_chloroquine:
             await user_patient.remove_roles(role_covid)
             await ctx.send(f":medical_symbol: {user_patient.name} est guéri, merci Docteur!")
             await user_patient.edit(nick='')
@@ -258,9 +278,19 @@ async def masque(ctx):
     role_masque = discord.utils.find(lambda r: r.name == role_masque_name, ctx.message.guild.roles)
     await ctx.message.author.add_roles(role_masque)
     if role_masque in ctx.guild.get_member(ctx.message.author.id).roles:
-        await ctx.send(f":mask: {ctx.message.author.display_name} a remplacé son masque !")
+        replies_replacemask = [
+            f":mask: {ctx.message.author.display_name} a remplacé son masque !",
+            f":mask: {ctx.message.author.display_name} a changé son masque !",
+            f":mask: {ctx.message.author.display_name} montre l'exemple, et change de masque."
+        ]
+        await ctx.send(random.choice(replies_replacemask))
     else:
-        await ctx.send(f":mask: {ctx.message.author.display_name} a mis un masque !")
+        replies_putmask = [
+            f":mask: {ctx.message.author.display_name} a mis un masque !",
+            f":mask: {ctx.message.author.display_name} a enfin mis son masque !",
+            f":mask: {ctx.message.author.display_name} montre l'exemple, et met un masque."
+        ]
+        await ctx.send(random.choice(replies_putmask))
 
 
 @bot.command(aliases=['rt-pcr', 'test-anal'])
@@ -287,6 +317,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
+    await self_heal(message)
     await show_symptoms(message)
     print("{} répond à {} - {}".format(message.author, last_message.author, message.content.lower()))
     gestes_barrieres = ["%geste_barrière", "%geste_barriere", "%gestes_barrieres" "%gestes_barrières"]
@@ -296,8 +327,8 @@ async def on_message(message):
     if porte_masque(message):
         role_masque = discord.utils.find(lambda r: r.name == role_masque_name, message.guild.roles)
         reponses_perte_masque = ["n'a plus de masque",
-                                 "a perdu son masque"]
-        proba_perte_masque = 0.05
+                                 "a perdu son masque",
+                                 "a fait tomber son masque"]
         if random.random() <= proba_perte_masque:
             await message.author.remove_roles(role_masque)
             if message.content == "%masque":
@@ -310,7 +341,13 @@ Bah alors {message.author.display_name}, on ne sait pas mettre un masque?")
 
     # FONCTIONS BONUS
     if "covid" in message.content:
-        await message.channel.send("On m'a appelé?")
+        replies_covid = [
+            "On m'a appelé ?",
+            "Qui me parle ?",
+            "Plaît-il ?",
+            "Comment ça 'covid' ?"
+        ]
+        await message.channel.send(random.choice(replies_covid))
         return
 
     # détection cyrillique => cyka
