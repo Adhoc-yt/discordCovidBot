@@ -80,11 +80,11 @@ suffixes_peu_glorieux = [" le gilet jaune",
 image_sibeth = discord.File('sibeth.png')
 covid_channel = "covid-log"
 # Probas
-proba_perte_masque = 0.01
+proba_perte_masque = 0.025
 proba_guerison_chloroquine = 0.80
-proba_guerison_solo = 0.10
+proba_guerison_solo = 0.05
 proba_covid_5g = 0.70
-proba_symptom = 0.30
+proba_symptom = 0.40
 proba_kick_chloroquine = 0.05
 
 # Fonction Usage et Help (erreur mauvais paramètres + description du jeu)
