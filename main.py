@@ -365,6 +365,11 @@ Bah alors {message.author.display_name}, on ne sait pas mettre un masque?")
         await message.channel.send("FEUR!")
         return
 
+    if ''.join(filter(str.isalpha, message.content.lower())).endswith("oui") \
+            and not message.content.lower().endswith(">"):
+        await message.channel.send("STITI!")
+        return
+
     if not message.author.bot and risk_infection(last_message):
         if risk_infection(message) or random.random() >= transmission_rate:
             return
