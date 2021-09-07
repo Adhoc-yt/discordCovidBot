@@ -92,7 +92,10 @@ dict_questions_reponses = {'quoi': 'feur',
                            'hein': 'deux',
                            'un': 'deux',
                            'ain': 'deux',
-                           'bon': 'jour'
+                           'bon': 'jour',
+                           'qui': 'quette',
+                           'ki': 'quette',
+                           'ky': 'quette'
                            }
 image_sibeth = discord.File('sibeth.png')
 covid_channel = "covid-log"
