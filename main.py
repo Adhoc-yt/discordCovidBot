@@ -82,6 +82,18 @@ suffixes_peu_glorieux = [" gilet jaune",
                          " la petite bite",
                          " la pute"
                          ]
+dict_questions_reponses = {'quoi': 'feur',
+                           'pk': 'feur',
+                           'pq': 'feur',
+                           'non': 'bril',
+                           'oui': 'stiti',
+                           'ui': 'stiti',
+                           'ouais': 'stern',
+                           'hein': 'deux',
+                           'un': 'deux',
+                           'ain': 'deux',
+                           'bon': 'jour'
+                           }
 image_sibeth = discord.File('sibeth.png')
 covid_channel = "covid-log"
 # Probas
@@ -91,6 +103,7 @@ proba_guerison_solo = 0.05
 proba_covid_5g = 0.70
 proba_symptom = 0.40
 proba_kick_chloroquine = 0.05
+proba_fin_de_phrase = 0.90
 
 # Fonction Usage et Help (erreur mauvais paramètres + description du jeu)
 # Fonction infection_passive, qui infecte les membres côte à côte dans la liste alphabétique des users
@@ -323,7 +336,11 @@ async def on_message(message):
         return
 
     await self_heal(message)
-    await show_symptoms(message)
+    try:
+        await show_symptoms(message)
+    finally:
+        pass
+
     print("{} répond à {} - {}".format(message.author, last_message.author, message.content.lower()))
     gestes_barrieres = ["%geste_barrière", "%geste_barriere", "%gestes_barrieres" "%gestes_barrières"]
     if any(geste_barriere in message.content for geste_barriere in gestes_barrieres):
@@ -350,28 +367,37 @@ Bah alors {message.author.display_name}, on ne sait pas mettre un masque?")
             "On m'a appelé ?",
             "Qui me parle ?",
             "Plaît-il ?",
-            "Comment ça 'covid' ?"
+            "Comment ça 'covid' ?",
+            "Oui(stiti) ?",
+            "Quoi, encore ?",
+            "*blushes*",
+            "Je suis une sacrée starlette."
         ]
         await message.channel.send(random.choice(replies_covid))
         return
 
     # détection cyrillique => cyka
     if re.search('[а-яА-Я]', message.content):
-        await message.channel.send("сука блять")
+        insultes_russes = ["сука блять",
+                           "иди нахуй",
+                           "мудак",
+                           "Пёс ёб твою мать",
+                           "Меня это заебало",
+                           "заткнись"
+                           ]
+        await message.channel.send(random.choice(insultes_russes))
         return
 
-    if ''.join(filter(str.isalpha, message.content.lower())).endswith("quoi") \
-            and not message.content.lower().endswith(">"):
-        await message.channel.send("FEUR!")
-        return
-
-    if ''.join(filter(str.isalpha, message.content.lower())).endswith("oui") \
-            and not message.content.lower().endswith(">"):
-        await message.channel.send("STITI!")
-        return
+    # fins de phrases remarquables
+    if not message.content.lower().endswith(">") and random.random() <= proba_fin_de_phrase:
+        filtered_message = ''.join(filter(str.isalpha, message.content.lower()))
+        for fin_de_phrase in dict_questions_reponses:
+            if filtered_message.endswith(fin_de_phrase):
+                await message.channel.send(dict_questions_reponses[fin_de_phrase].upper()+"!")
+                return
 
     if not message.author.bot and risk_infection(last_message):
-        if risk_infection(message) or random.random() >= transmission_rate:
+        if risk_infection(message) or random.random() <= transmission_rate:
             return
         else:
             await get_covid(message)
