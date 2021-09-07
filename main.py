@@ -165,7 +165,7 @@ def porte_masque(message):
 
 @bot.event
 async def on_ready() -> None:
-    print("{} : Démarrage de bot".format(datetime.now()))
+    print("{} : Démarrage du bot Covid".format(datetime.now()))
 
 
 async def get_covid(message):
@@ -339,12 +339,10 @@ async def on_message(message):
     last_message = last_message[1]
     message.content = message.content.lower()
 
-    print("DEBUG analyse msg")
     if message.author.bot:
         print("Ignored bot {} saying: {}".format(message.author, message.content))
         return  # ignore bot messages
 
-    print("DEBUG not a bot")
     await self_heal(message)
     await show_symptoms(message)
 
@@ -353,7 +351,6 @@ async def on_message(message):
     if any(geste_barriere in message.content for geste_barriere in gestes_barrieres):
         return
 
-    print("DEBUG pas de geste barriere")
     if porte_masque(message):
         role_masque = discord.utils.find(lambda r: r.name == role_masque_name, message.guild.roles)
         reponses_perte_masque = ["n'a plus de masque",
