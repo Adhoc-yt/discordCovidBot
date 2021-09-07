@@ -337,19 +337,23 @@ async def on_message(message):
     # Logging
     last_message = await message.channel.history(limit=2).flatten()
     last_message = last_message[1]
+    message.content = message.content.lower()
 
+    print("DEBUG analyse msg")
     if message.author.bot:
-        print("Ignored bot {} saying: {}".format(message.author, message.content.lower()))
+        print("Ignored bot {} saying: {}".format(message.author, message.content))
         return  # ignore bot messages
 
+    print("DEBUG not a bot")
     await self_heal(message)
     await show_symptoms(message)
 
-    print("{} répond à {} - {}".format(message.author, last_message.author, message.content.lower()))
+    print("{} répond à {} - {}".format(message.author, last_message.author, message.content))
     gestes_barrieres = ["%geste_barrière", "%geste_barriere", "%gestes_barrieres" "%gestes_barrières"]
     if any(geste_barriere in message.content for geste_barriere in gestes_barrieres):
         return
 
+    print("DEBUG pas de geste barriere")
     if porte_masque(message):
         role_masque = discord.utils.find(lambda r: r.name == role_masque_name, message.guild.roles)
         reponses_perte_masque = ["n'a plus de masque",
@@ -363,7 +367,8 @@ Bah alors {message.author.display_name}, on ne sait pas mettre un masque?")
                 await message.channel.send(file=image_sibeth)
             else:
                 await message.channel.send(f"{message.author.display_name} {random.choice(reponses_perte_masque)}")
-        return
+            return
+
     # FONCTIONS BONUS
     if "covid" in message.content:
         replies_covid = [
@@ -392,10 +397,9 @@ Bah alors {message.author.display_name}, on ne sait pas mettre un masque?")
         return
 
     # fins de phrases remarquables
-    if not message.content.lower().endswith(">") and random.random() <= proba_fin_de_phrase:
-        filtered_message = ''.join(filter(str.isalpha, message.content.lower()))
+    if not message.content.endswith(">") and random.random() <= proba_fin_de_phrase:
+        filtered_message = ''.join(filter(str.isalpha, message.content))
         for fin_de_phrase in dict_questions_reponses:
-            print("DEBUG" + filtered_message + "test endswith" + fin_de_phrase)
             if filtered_message.endswith(fin_de_phrase):
                 await message.channel.send(dict_questions_reponses[fin_de_phrase].upper() + "!")
                 return
