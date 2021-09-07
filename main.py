@@ -83,18 +83,18 @@ suffixes_peu_glorieux = [" gilet jaune",
                          " la pute"
                          ]
 dict_questions_reponses = {'quoi': 'feur',
-                           'pk': 'feur',
+                           'pk': 'fure',
                            'pq': 'feur',
                            'non': 'bril',
                            'oui': 'stiti',
                            'ui': 'stiti',
                            'ouais': 'stern',
-                           'hein': 'deux',
-                           'un': 'deux',
-                           'ain': 'deux',
+                           'hein': 'dien',
+                           'un': 'dien',
+                           'ain': 'dien',
                            'bon': 'jour',
                            'qui': 'quette',
-                           'ki': 'quette',
+                           'ki': 'wi',
                            'ky': 'quette',
                            'test': 'ticule',
                            'tests': 'ticule'
@@ -109,6 +109,7 @@ proba_covid_5g = 0.70
 proba_symptom = 0.40
 proba_kick_chloroquine = 0.05
 proba_fin_de_phrase = 0.90
+
 
 # Fonction Usage et Help (erreur mauvais paramètres + description du jeu)
 # Fonction infection_passive, qui infecte les membres côte à côte dans la liste alphabétique des users
@@ -337,14 +338,12 @@ async def on_message(message):
     last_message = await message.channel.history(limit=2).flatten()
     last_message = last_message[1]
 
-    if message.author == bot.user:
-        return
+    if message.author.bot:
+        print("Ignored bot {} saying: {}".format(message.author, message.content.lower()))
+        return  # ignore bot messages
 
     await self_heal(message)
-    try:
-        await show_symptoms(message)
-    finally:
-        pass
+    await show_symptoms(message)
 
     print("{} répond à {} - {}".format(message.author, last_message.author, message.content.lower()))
     gestes_barrieres = ["%geste_barrière", "%geste_barriere", "%gestes_barrieres" "%gestes_barrières"]
@@ -365,7 +364,6 @@ Bah alors {message.author.display_name}, on ne sait pas mettre un masque?")
             else:
                 await message.channel.send(f"{message.author.display_name} {random.choice(reponses_perte_masque)}")
         return
-
     # FONCTIONS BONUS
     if "covid" in message.content:
         replies_covid = [
@@ -375,7 +373,7 @@ Bah alors {message.author.display_name}, on ne sait pas mettre un masque?")
             "Comment ça 'covid' ?",
             "Oui(stiti) ?",
             "Quoi, encore ?",
-            "*blushes*",
+            '*blushes*',
             "Je suis une sacrée starlette."
         ]
         await message.channel.send(random.choice(replies_covid))
@@ -397,8 +395,9 @@ Bah alors {message.author.display_name}, on ne sait pas mettre un masque?")
     if not message.content.lower().endswith(">") and random.random() <= proba_fin_de_phrase:
         filtered_message = ''.join(filter(str.isalpha, message.content.lower()))
         for fin_de_phrase in dict_questions_reponses:
+            print("DEBUG" + filtered_message + "test endswith" + fin_de_phrase)
             if filtered_message.endswith(fin_de_phrase):
-                await message.channel.send(dict_questions_reponses[fin_de_phrase].upper()+"!")
+                await message.channel.send(dict_questions_reponses[fin_de_phrase].upper() + "!")
                 return
 
     if not message.author.bot and risk_infection(last_message):
