@@ -10,7 +10,7 @@ intents.members = True
 bot = commands.Bot(command_prefix="%", intents=intents)
 transmission_rate = .69
 role_covid_name = 'Covided'
-role_dr_name = 'Dr Raoult le Fédérateur'
+role_dr_name = 'Docteur-Marabout chloroquine'
 role_5g_name = 'Technicien Orange'
 role_masque_name = 'Porte un masque'
 suffixes_peu_glorieux = [" gilet jaune",
@@ -53,7 +53,7 @@ suffixes_peu_glorieux = [" gilet jaune",
                          " l'infidèle",
                          " la grosse cochonne",
                          " ramolo",
-                         " mou·e du genou"
+                         " la petite chienne ouaf ouaf"
                          " relou·e",
                          " soumis·e",
                          " bâtard·e",
@@ -69,18 +69,21 @@ suffixes_peu_glorieux = [" gilet jaune",
                          " anorexique",
                          " obsédé·e",
                          " gérontophile",
-                         " pervers·e",
+                         " l'ultra pervers·e",
                          " pleutre",
                          " l'impotent·e",
-                         " frigide",
-                         " pédophile",
+                         " la chienne frigide",
+                         " à la tendance pédophile",
                          " l'angoissé·e",
                          " maniaco-dépressif·ve",
                          " schizophrène",
                          " l'obèse morbide",
                          " l'impuissant·e",
                          " la petite bite",
-                         " la pute"
+                         " la pute",
+                         " le sac à foutre",
+                         " la serpillère à sperme",
+                         " avec un petit sac à main"
                          ]
 dict_questions_reponses = {'quoi': 'feur',
                            'pk': 'fure',
