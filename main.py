@@ -110,7 +110,7 @@ proba_guerison_solo = 0.05
 proba_covid_5g = 0.70
 proba_symptom = 0.40
 proba_kick_chloroquine = 0.05
-proba_fin_de_phrase = 0.90
+proba_fin_de_phrase = 0.60
 
 
 # Fonction Usage et Help (erreur mauvais paramètres + description du jeu)
