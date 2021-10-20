@@ -366,7 +366,8 @@ Bah alors {message.author.display_name}, on ne sait pas mettre un masque?")
                 await message.channel.send(file=image_sibeth)
             else:
                 await message.channel.send(f"{message.author.display_name} {random.choice(reponses_perte_masque)}")
-            return
+
+        return
 
     # FONCTIONS BONUS
     if "covid" in message.content:
