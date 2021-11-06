@@ -270,7 +270,7 @@ async def heal(ctx, user_patient: discord.Member):
     if role_covid in user_patient.roles:
         if random.random() <= proba_kick_chloroquine:
             await user_patient.send(":skull: Le Covid n'a pas eu raison de toi, mais le docteur, oui.\n\
-Pour revenir: https://discord.gg/85yShvhRgX")
+Pour revenir: https://discord.gg/tZ6Vww4S9a")
             await ctx.guild.kick(user_patient, reason="Chloroquined")
             await ctx.send(f":skull: {user_patient.name} n'a pas survécu à sa dose de choloroquine!")
         elif random.random() <= proba_guerison_chloroquine:
