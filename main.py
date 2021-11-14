@@ -10,8 +10,8 @@ intents.members = True
 bot = commands.Bot(command_prefix="%", intents=intents)
 transmission_rate = .69
 role_covid_name = 'Covided'
-role_dr_name = 'Docteur-Marabout chloroquine'
-role_5g_name = 'Technicien Orange'
+role_dr_name = 'Defense-Covid'
+role_5g_name = 'Attaque-Covid'
 role_masque_name = 'Porte un masque'
 suffixes_peu_glorieux = [" gilet jaune",
                          " malade",
